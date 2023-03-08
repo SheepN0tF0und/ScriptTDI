@@ -1,0 +1,100 @@
+#!/bin/bash
+
+echo -e "\e[33mDigite o \e[32mDominio\e[0m"
+read url
+
+menu() {
+    echo -e "1-\e[36mUsar o ParamSpider\e[0m"
+    echo -e "2-\e[34mAchar Subdominios\e[0m"
+    echo -e "3-\e[92mUsar httpx\e[0m"
+    echo -e "4-\e[35mUsar Nuclei\e[0m"
+    echo -e "5-\e[33mSair\e[0m"
+}
+
+
+subdominios() {
+    echo -e "executando subfinder em \e[32m$url\e[0m"
+    ~/go/bin/subfinder -d $url
+}
+
+httpx() {
+    echo -e "\e[92mVerificando se o dominio está ativo...\e[0m"
+
+    ~/go/bin/httpx -u $url -td -sc -title
+}
+
+parametro() {
+    echo -e "executando paramspider em \e[32m$url\e[0m"
+    python3 ~/ParamSpider/paramspider.py -d  $url
+}
+
+nuclei() {
+    echo -e "\e[33m Quais templates quer usar?\e[92m"
+    echo -e "1-todos"
+    echo -e "2-exposures"
+    echo -e "3-cves"
+    echo -e "4-exposed panels"
+    echo -e "5-fuzzing"
+    echo -e "6-vulnerabilities\e[0m"
+
+
+
+    read template
+
+    case $template in
+
+        1)
+            ~/go/bin/nuclei -u $url -t ~/nuclei-templates
+            ;;
+        2)
+            ~/go/bin/nuclei -u $url -t ~/nuclei-templates/exposures
+            ;;
+        3)
+            ~/go/bin/nuclei -u $url -t ~/nuclei-templates/cves
+            ;;
+        4)
+            ~/go/bin/nuclei -u $url -t ~/nuclei-templates/exposed-panels
+            ;;
+        5)
+            ~/go/bin/nuclei -u $url -t ~/nuclei-templates/fuzzing
+            ;;
+        6)
+            ~/go/bin/nuclei -u $url -t ~/nuclei-templates/vulnerabilities
+            ;;
+
+        *)  echo -e "\e[33mOpção invalida, retornando ao menu principal...\e[0m"
+            return
+            ;;
+    esac
+}
+
+
+while true; do
+
+    menu
+
+    read opcao
+
+    case $opcao in
+            1)
+                parametro
+                ;;
+            2)
+                subdominios
+                ;;
+            3)
+                httpx
+                ;;
+            4)
+                nuclei
+                ;;
+
+            5)
+                echo -e "\e[33mSaindo\e[0m"
+                exit 0
+                ;;
+            *)
+                echo -e "\e[33mOpção invalida\e[0m"
+                ;;
+    esac
+done
