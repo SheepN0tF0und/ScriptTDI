@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Definir o nome do usuário e o nome do repositório
+username="SheepN0tF0und"
+reponame="InstaladorTDI"
+
+# Verificar se o repositório já foi clonado anteriormente
+if [ -d "$reponame" ]; then
+  echo "Repositório já existe, continuando com o script original."
+else
+  # Baixar o repositório requerido 
+  git clone https://github.com/$username/$reponame
+  
+  # Instalar o script dentro do repositório
+  cd "$reponame"
+  chmod +x Instalador
+  ./Instalador
+  
+  # Voltar para o diretório original
+  cd ..
+fi
+
 echo -e "\e[33mDigite o \e[32mDominio\e[0m"
 read url
 
